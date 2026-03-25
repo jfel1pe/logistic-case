@@ -2,6 +2,7 @@ package com.logistic.logistic.controller;
 
 import com.logistic.logistic.dto.ProductTypeDTO;
 import com.logistic.logistic.service.ProductTypeService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class ProductTypeController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductTypeDTO> createProductType(@RequestBody ProductTypeDTO productTypeDTO) {
+    public ResponseEntity<ProductTypeDTO> createProductType(@Valid @RequestBody ProductTypeDTO productTypeDTO) {
         ProductTypeDTO created = productTypeService.createProductType(productTypeDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -39,7 +40,7 @@ public class ProductTypeController {
     @PutMapping("/{id}")
     public ResponseEntity<ProductTypeDTO> updateProductType(
             @PathVariable Integer id,
-            @RequestBody ProductTypeDTO productTypeDTO) {
+            @Valid @RequestBody ProductTypeDTO productTypeDTO) {
         ProductTypeDTO updated = productTypeService.updateProductType(id, productTypeDTO);
         return ResponseEntity.ok(updated);
     }

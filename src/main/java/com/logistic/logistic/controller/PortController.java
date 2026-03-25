@@ -2,6 +2,7 @@ package com.logistic.logistic.controller;
 
 import com.logistic.logistic.dto.PortDTO;
 import com.logistic.logistic.service.PortService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class PortController {
     }
 
     @PostMapping
-    public ResponseEntity<PortDTO> createPort(@RequestBody PortDTO portDTO) {
+    public ResponseEntity<PortDTO> createPort(@Valid @RequestBody PortDTO portDTO) {
         PortDTO created = portService.createPort(portDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -39,7 +40,7 @@ public class PortController {
     @PutMapping("/{id}")
     public ResponseEntity<PortDTO> updatePort(
             @PathVariable Integer id,
-            @RequestBody PortDTO portDTO) {
+            @Valid @RequestBody PortDTO portDTO) {
         PortDTO updated = portService.updatePort(id, portDTO);
         return ResponseEntity.ok(updated);
     }

@@ -2,6 +2,7 @@ package com.logistic.logistic.controller;
 
 import com.logistic.logistic.dto.LandShipmentDTO;
 import com.logistic.logistic.service.LandShipmentService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class LandShipmentController {
 
     @PostMapping
     public ResponseEntity<LandShipmentDTO> createLandShipment(
-            @RequestBody LandShipmentDTO landShipmentDTO) {
+            @Valid @RequestBody LandShipmentDTO landShipmentDTO) {
         LandShipmentDTO created = landShipmentService.createLandShipment(landShipmentDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -40,7 +41,7 @@ public class LandShipmentController {
     @PutMapping("/{id}")
     public ResponseEntity<LandShipmentDTO> updateLandShipment(
             @PathVariable Integer id,
-            @RequestBody LandShipmentDTO landShipmentDTO) {
+            @Valid @RequestBody LandShipmentDTO landShipmentDTO) {
         LandShipmentDTO updated = landShipmentService.updateLandShipment(id, landShipmentDTO);
         return ResponseEntity.ok(updated);
     }

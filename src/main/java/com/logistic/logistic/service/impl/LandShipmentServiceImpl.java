@@ -2,13 +2,17 @@ package com.logistic.logistic.service.impl;
 
 import com.logistic.logistic.dto.LandShipmentDTO;
 import com.logistic.logistic.entity.*;
+import com.logistic.logistic.exception.DuplicateResourceException;
+import com.logistic.logistic.exception.ResourceNotFoundException;
 import com.logistic.logistic.repository.*;
 import com.logistic.logistic.service.LandShipmentService;
+import com.logistic.logistic.util.GuideNumberGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,16 +29,20 @@ public class LandShipmentServiceImpl implements LandShipmentService {
     private final ProductTypeRepository productTypeRepository;
     private final WarehouseRepository warehouseRepository;
 
+    private final GuideNumberGenerator guideNumberGenerator;
+
     public LandShipmentServiceImpl(LandShipmentRepository landShipmentRepository,
                                    ShipmentRepository shipmentRepository,
                                    ClientRepository clientRepository,
                                    ProductTypeRepository productTypeRepository,
-                                   WarehouseRepository warehouseRepository) {
+                                   WarehouseRepository warehouseRepository,
+                                   GuideNumberGenerator guideNumberGenerator) {
         this.landShipmentRepository = landShipmentRepository;
         this.shipmentRepository = shipmentRepository;
         this.clientRepository = clientRepository;
         this.productTypeRepository = productTypeRepository;
         this.warehouseRepository = warehouseRepository;
+        this.guideNumberGenerator = guideNumberGenerator;
     }
 
     @Override
@@ -42,35 +50,38 @@ public class LandShipmentServiceImpl implements LandShipmentService {
 
         // Validar número de guía único
         if (shipmentRepository.existsByGuideNumber(dto.getGuideNumber())) {
-            throw new RuntimeException("An order with the tracking number already exists: "
+            throw new DuplicateResourceException("An order with the tracking number already exists: "
                     + dto.getGuideNumber());
         }
 
         // Buscar entidades relacionadas
         Client client = clientRepository.findById(dto.getClientId())
-                .orElseThrow(() -> new RuntimeException("The client was not found whit id: "
+                .orElseThrow(() -> new ResourceNotFoundException("The client was not found whit id: "
                         + dto.getClientId()));
 
         ProductType productType = productTypeRepository.findById(dto.getProductTypeId())
-                .orElseThrow(() -> new RuntimeException("The product was not found with id: "
+                .orElseThrow(() -> new ResourceNotFoundException("The product was not found with id: "
                         + dto.getProductTypeId()));
 
         Warehouse warehouse = warehouseRepository.findById(dto.getWarehouseId())
-                .orElseThrow(() -> new RuntimeException("The warehouse was not found with id: "
+                .orElseThrow(() -> new ResourceNotFoundException("The warehouse was not found with id: "
                         + dto.getWarehouseId()));
 
         // Calcular descuento
         BigDecimal priceDiscount = calculateDiscount(dto.getQuantity(), dto.getPrice());
+
+        // Genera número de guía automáticamente
+        String guideNumber = guideNumberGenerator.generate();
 
         // Crear y guardar Shipment base
         Shipment shipment = new Shipment();
         shipment.setClient(client);
         shipment.setProductType(productType);
         shipment.setQuantity(dto.getQuantity());
-        shipment.setRegistryDate(dto.getRegistryDate());
+        shipment.setRegistryDate(LocalDateTime.now());
         shipment.setDeliveryDate(dto.getDeliveryDate());
         shipment.setPrice(dto.getPrice());
-        shipment.setGuideNumber(dto.getGuideNumber());
+        shipment.setGuideNumber(guideNumber);
         shipment.setPriceDiscount(priceDiscount);
         Shipment savedShipment = shipmentRepository.save(shipment);
 
@@ -78,7 +89,7 @@ public class LandShipmentServiceImpl implements LandShipmentService {
         LandShipment landShipment = new LandShipment();
         landShipment.setShipment(savedShipment);
         landShipment.setWarehouse(warehouse);
-        landShipment.setVehiclePlate(dto.getVehiclePlate());
+        landShipment.setVehiclePlate(dto.getVehiclePlate().toUpperCase());
         LandShipment saved = landShipmentRepository.save(landShipment);
 
         return mapToDTO(saved);
@@ -97,25 +108,25 @@ public class LandShipmentServiceImpl implements LandShipmentService {
     @Transactional(readOnly = true)
     public LandShipmentDTO getLandShipmentById(Integer id) {
         LandShipment landShipment = landShipmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("(GET)The LandShipment was not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("(GET)The LandShipment was not found with id: " + id));
         return mapToDTO(landShipment);
     }
 
     @Override
     public LandShipmentDTO updateLandShipment(Integer id, LandShipmentDTO dto) {
         LandShipment landShipment = landShipmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("(UPDATE)The LandShipment was not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("(UPDATE)The LandShipment was not found with id: " + id));
 
         Client client = clientRepository.findById(dto.getClientId())
-                .orElseThrow(() -> new RuntimeException("(UPDATE LANDSHIPMENT)The client was not found whit id: "
+                .orElseThrow(() -> new ResourceNotFoundException("(UPDATE LANDSHIPMENT)The client was not found whit id: "
                         + dto.getClientId()));
 
         ProductType productType = productTypeRepository.findById(dto.getProductTypeId())
-                .orElseThrow(() -> new RuntimeException("(UPDATE LANDSHIPMENT)The product was not found with id: "
+                .orElseThrow(() -> new ResourceNotFoundException("(UPDATE LANDSHIPMENT)The product was not found with id: "
                         + dto.getProductTypeId()));
 
         Warehouse warehouse = warehouseRepository.findById(dto.getWarehouseId())
-                .orElseThrow(() -> new RuntimeException("(UPDATE LANDSHIPMENT)The Warehouse was not found with id: "
+                .orElseThrow(() -> new ResourceNotFoundException("(UPDATE LANDSHIPMENT)The Warehouse was not found with id: "
                         + dto.getWarehouseId()));
 
         // Recalcular descuento
@@ -144,7 +155,7 @@ public class LandShipmentServiceImpl implements LandShipmentService {
     @Override
     public void deleteLandShipment(Integer id) {
         LandShipment landShipment = landShipmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("The LandShipment was not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("The LandShipment was not found with id: " + id));
 
         landShipmentRepository.delete(landShipment);
         shipmentRepository.delete(landShipment.getShipment());

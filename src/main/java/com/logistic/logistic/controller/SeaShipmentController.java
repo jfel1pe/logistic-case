@@ -2,6 +2,7 @@ package com.logistic.logistic.controller;
 
 import com.logistic.logistic.dto.SeaShipmentDTO;
 import com.logistic.logistic.service.SeaShipmentService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class SeaShipmentController {
 
     @PostMapping
     public ResponseEntity<SeaShipmentDTO> createSeaShipment(
-            @RequestBody SeaShipmentDTO seaShipmentDTO) {
+            @Valid @RequestBody SeaShipmentDTO seaShipmentDTO) {
         SeaShipmentDTO created = seaShipmentService.createSeaShipment(seaShipmentDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -40,7 +41,7 @@ public class SeaShipmentController {
     @PutMapping("/{id}")
     public ResponseEntity<SeaShipmentDTO> updateSeaShipment(
             @PathVariable Integer id,
-            @RequestBody SeaShipmentDTO seaShipmentDTO) {
+            @Valid @RequestBody SeaShipmentDTO seaShipmentDTO) {
         SeaShipmentDTO updated = seaShipmentService.updateSeaShipment(id, seaShipmentDTO);
         return ResponseEntity.ok(updated);
     }

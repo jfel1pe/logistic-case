@@ -2,6 +2,7 @@ package com.logistic.logistic.service.impl;
 
 import com.logistic.logistic.dto.WarehouseDTO;
 import com.logistic.logistic.entity.Warehouse;
+import com.logistic.logistic.exception.ResourceNotFoundException;
 import com.logistic.logistic.repository.WarehouseRepository;
 import com.logistic.logistic.service.WarehouseService;
 import org.springframework.stereotype.Service;
@@ -40,14 +41,14 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Transactional(readOnly = true)
     public WarehouseDTO getWarehouseById(Integer id) {
         Warehouse warehouse = warehouseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("(GET)The warehouse was not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("(GET)The warehouse was not found: " + id));
         return mapToDTO(warehouse);
     }
 
     @Override
     public WarehouseDTO updateWarehouse(Integer id, WarehouseDTO warehouseDTO) {
         Warehouse warehouse = warehouseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("(UPDATE)The warehouse was not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("(UPDATE)The warehouse was not found: " + id));
 
         warehouse.setName(warehouseDTO.getName());
         warehouse.setCountry(warehouseDTO.getCountry());
@@ -60,7 +61,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     public void deleteWarehouse(Integer id) {
         if (!warehouseRepository.existsById(id)) {
-            throw new RuntimeException("(DELETE)The warehouse was not found: " + id);
+            throw new ResourceNotFoundException("(DELETE)The warehouse was not found: " + id);
         }
         warehouseRepository.deleteById(id);
     }

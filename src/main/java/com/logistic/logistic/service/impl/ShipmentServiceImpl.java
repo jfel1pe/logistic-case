@@ -4,6 +4,7 @@ import com.logistic.logistic.dto.ShipmentDTO;
 import com.logistic.logistic.entity.Client;
 import com.logistic.logistic.entity.ProductType;
 import com.logistic.logistic.entity.Shipment;
+import com.logistic.logistic.exception.ResourceNotFoundException;
 import com.logistic.logistic.repository.ClientRepository;
 import com.logistic.logistic.repository.ProductTypeRepository;
 import com.logistic.logistic.repository.ShipmentRepository;
@@ -67,21 +68,21 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Transactional(readOnly = true)
     public ShipmentDTO getShipmentById(Integer id) {
         Shipment shipment = shipmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("(GET)The shipment was not found id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("(GET)The shipment was not found id: " + id));
         return mapToDTO(shipment);
     }
 
     @Override
     public ShipmentDTO updateShipment(Integer id, ShipmentDTO shipmentDTO) {
         Shipment shipment = shipmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("(UPDATE)The shipment was not found id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("(UPDATE)The shipment was not found id: " + id));
 
         Client client = clientRepository.findById(shipmentDTO.getClientId())
-                .orElseThrow(() -> new RuntimeException("(UPDATE SHIPMENT)The client was not found whit id: "
+                .orElseThrow(() -> new ResourceNotFoundException("(UPDATE SHIPMENT)The client was not found whit id: "
                         + shipmentDTO.getClientId()));
 
         ProductType productType = productTypeRepository.findById(shipmentDTO.getProductTypeId())
-                .orElseThrow(() -> new RuntimeException("(UPDATE SHIPMENT)The product was not found with id: "
+                .orElseThrow(() -> new ResourceNotFoundException("(UPDATE SHIPMENT)The product was not found with id: "
                         + shipmentDTO.getProductTypeId()));
 
         shipment.setClient(client);
@@ -100,7 +101,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     public void deleteShipment(Integer id) {
         if (!shipmentRepository.existsById(id)) {
-            throw new RuntimeException("(DELETE) The shipment was not found id: " + id);
+            throw new ResourceNotFoundException("(DELETE) The shipment was not found id: " + id);
         }
         shipmentRepository.deleteById(id);
     }

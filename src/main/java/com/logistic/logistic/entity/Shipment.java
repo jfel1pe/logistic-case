@@ -32,6 +32,11 @@ public class Shipment {
     @Column(name = "registry_date", nullable = false)
     private LocalDateTime registryDate;
 
+    @PrePersist
+    public void prePersist() {
+        this.registryDate = LocalDateTime.now();
+    }
+
     @Column(name = "delivery_date", nullable = false)
     private LocalDateTime deliveryDate;
 

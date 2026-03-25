@@ -2,6 +2,7 @@ package com.logistic.logistic.controller;
 
 import com.logistic.logistic.dto.WarehouseDTO;
 import com.logistic.logistic.service.WarehouseService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class WarehouseController {
     }
 
     @PostMapping
-    public ResponseEntity<WarehouseDTO> createWarehouse(@RequestBody WarehouseDTO warehouseDTO) {
+    public ResponseEntity<WarehouseDTO> createWarehouse(@Valid @RequestBody WarehouseDTO warehouseDTO) {
         WarehouseDTO created = warehouseService.createWarehouse(warehouseDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -39,7 +40,7 @@ public class WarehouseController {
     @PutMapping("/{id}")
     public ResponseEntity<WarehouseDTO> updateWarehouse(
             @PathVariable Integer id,
-            @RequestBody WarehouseDTO warehouseDTO) {
+            @Valid @RequestBody WarehouseDTO warehouseDTO) {
         WarehouseDTO updated = warehouseService.updateWarehouse(id, warehouseDTO);
         return ResponseEntity.ok(updated);
     }

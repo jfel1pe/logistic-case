@@ -2,6 +2,7 @@ package com.logistic.logistic.service.impl;
 
 import com.logistic.logistic.dto.ClientDTO;
 import com.logistic.logistic.entity.Client;
+import com.logistic.logistic.exception.ResourceNotFoundException;
 import com.logistic.logistic.repository.ClientRepository;
 import com.logistic.logistic.service.ClientService;
 
@@ -41,14 +42,14 @@ public class ClientServiceImpl implements ClientService {
     @Transactional(readOnly = true)
     public ClientDTO getClientById(Integer id) {
         Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("(GET)The client was not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("(GET)The client was not found: " + id));
         return mapToDTO(client);
     }
 
     @Override
     public ClientDTO updateClient(Integer id, ClientDTO clientDTO) {
         Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("(UPDATE)The client was not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("(UPDATE)The client was not found: " + id));
 
         client.setDocumentId(clientDTO.getDocumentId());
         client.setName(clientDTO.getName());
@@ -61,7 +62,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void deleteClient(Integer id) {
         if (!clientRepository.existsById(id)) {
-            throw new RuntimeException("(DELETE)The client was not found: " + id);
+            throw new ResourceNotFoundException("(DELETE)The client was not found: " + id);
         }
         clientRepository.deleteById(id);
     }

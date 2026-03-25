@@ -2,6 +2,7 @@ package com.logistic.logistic.service.impl;
 
 import com.logistic.logistic.dto.ProductTypeDTO;
 import com.logistic.logistic.entity.ProductType;
+import com.logistic.logistic.exception.ResourceNotFoundException;
 import com.logistic.logistic.repository.ProductTypeRepository;
 import com.logistic.logistic.service.ProductTypeService;
 import org.springframework.stereotype.Service;
@@ -40,14 +41,14 @@ public class ProductTypeServiceImpl implements ProductTypeService {
     @Transactional(readOnly = true)
     public ProductTypeDTO getProductTypeById(Integer id) {
         ProductType productType = productTypeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("(GET)The product was not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("(GET)The product was not found: " + id));
         return mapToDTO(productType);
     }
 
     @Override
     public ProductTypeDTO updateProductType(Integer id, ProductTypeDTO productTypeDTO) {
         ProductType productType = productTypeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("(UPDATE)The product was not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("(UPDATE)The product was not found: " + id));
 
         productType.setName(productTypeDTO.getName());
         productType.setDescription(productTypeDTO.getDescription());
@@ -59,7 +60,7 @@ public class ProductTypeServiceImpl implements ProductTypeService {
     @Override
     public void deleteProductType(Integer id) {
         if (!productTypeRepository.existsById(id)) {
-            throw new RuntimeException("(DELETE)The product was not found: " + id);
+            throw new ResourceNotFoundException("(DELETE)The product was not found: " + id);
         }
         productTypeRepository.deleteById(id);
     }

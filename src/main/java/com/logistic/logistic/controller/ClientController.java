@@ -2,6 +2,7 @@ package com.logistic.logistic.controller;
 
 import com.logistic.logistic.dto.ClientDTO;
 import com.logistic.logistic.service.ClientService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ public class ClientController {
     }
 
     @PostMapping
-    public ResponseEntity<ClientDTO> createClient(@RequestBody ClientDTO clientDTO) {
+    public ResponseEntity<ClientDTO> createClient(@Valid @RequestBody ClientDTO clientDTO) {
         ClientDTO created = clientService.createClient(clientDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -41,7 +42,7 @@ public class ClientController {
     @PutMapping("/{id}")
     public ResponseEntity<ClientDTO> updateClient(
             @PathVariable Integer id,
-            @RequestBody ClientDTO clientDTO) {
+            @Valid @RequestBody ClientDTO clientDTO) {
         ClientDTO updated = clientService.updateClient(id, clientDTO);
         return ResponseEntity.ok(updated);
     }

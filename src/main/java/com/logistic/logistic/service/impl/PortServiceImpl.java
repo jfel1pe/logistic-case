@@ -2,6 +2,7 @@ package com.logistic.logistic.service.impl;
 
 import com.logistic.logistic.dto.PortDTO;
 import com.logistic.logistic.entity.Port;
+import com.logistic.logistic.exception.ResourceNotFoundException;
 import com.logistic.logistic.repository.PortRepository;
 import com.logistic.logistic.service.PortService;
 import org.springframework.stereotype.Service;
@@ -40,14 +41,14 @@ public class PortServiceImpl implements PortService {
     @Transactional(readOnly = true)
     public PortDTO getPortById(Integer id) {
         Port port = portRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("(GET)The port was not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("(GET)The port was not found: " + id));
         return mapToDTO(port);
     }
 
     @Override
     public PortDTO updatePort(Integer id, PortDTO portDTO) {
         Port port = portRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("(UPDATE)The port was not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("(UPDATE)The port was not found: " + id));
 
         port.setName(portDTO.getName());
         port.setCountry(portDTO.getCountry());
@@ -61,7 +62,7 @@ public class PortServiceImpl implements PortService {
     @Override
     public void deletePort(Integer id) {
         if (!portRepository.existsById(id)) {
-            throw new RuntimeException("(DELETE)The port was not found: " + id);
+            throw new ResourceNotFoundException("(DELETE)The port was not found: " + id);
         }
         portRepository.deleteById(id);
     }
