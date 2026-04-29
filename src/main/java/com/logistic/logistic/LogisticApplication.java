@@ -10,7 +10,7 @@ public class LogisticApplication {
     public static void main(String[] args) {
         SpringApplication.run(LogisticApplication.class, args);
 
-        System.out.print("Hola mundo");
+        System.out.print("Hola mundo prueba");
     }
 
 
