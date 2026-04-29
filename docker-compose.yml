@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+
+  # Base de datos MySQL
+  db:
+    image: mysql:8.0
+    container_name: logistic_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: logistic
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: logistic_user
+      MYSQL_PASSWORD: logistic_pass
+    ports:
+      - "3307:3306"  # 3307 en tu PC para no chocar con tu MySQL local
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Tu aplicación Spring Boot
+  app:
+    build: .
+    container_name: logistic_app
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/logistic?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: logistic_user
+      SPRING_DATASOURCE_PASSWORD: logistic_pass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      JWT_EXPIRATION: 86400000
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  mysql_data:

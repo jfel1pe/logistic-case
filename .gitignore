@@ -4,6 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# Maven
+target/
+*.jar
+
 ### STS ###
 .apt_generated
 .classpath
@@ -14,10 +18,15 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
+*.xml
 *.ipr
+!pom.xml
+
+# Logs
+*.log
 
 ### NetBeans ###
 /nbproject/private/
